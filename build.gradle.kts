@@ -42,7 +42,7 @@ tasks.withType<Test> {
 
 tasks {
     compileKotlin {
-        dependsOn("openApiGenerators")
+        dependsOn("openApiGenerate")
     }
 }
 
