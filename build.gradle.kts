@@ -26,7 +26,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation ("org.springframework.boot:spring-boot-starter-validation")
 
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0") // openapi 를 위해 필수로 필요
+    implementation("org.springdoc:springdoc-openapi-ui:1.7.0")
 }
 
 sourceSets {
@@ -65,7 +65,6 @@ fun createOpenApiGenerateTask(fileName: String): TaskProvider<GenerateTask> {
         configOptions.set(
             mapOf(
                 "dateLibrary" to "spring",
-                "useSpringBoot3" to "true",
                 "useTags" to "true",
                 "openApiNullable" to "false",
                 // API를 interface로 생성한다.

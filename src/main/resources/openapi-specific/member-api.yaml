@@ -1,18 +1,23 @@
 openapi: 3.0.0
 info:
-  title: Member API
-  description: API for managing members
+  title: 회원 API
+  description: 회원 관리 API
   version: 1.0.0
 servers:
   - url: http://localhost:8080/api
-    description: Local server
+    description: 로컬 서버
+tags:
+  - name: Member
+    description: "회원 API - 사용자 관리"
 
 paths:
   /members:
     post:
-      summary: Register a new member
-      description: Creates a new member account
+      summary: 회원 등록
+      description: 새로운 회원 계정을 생성합니다.
       operationId: registerMember
+      tags:
+        - Member
       requestBody:
         required: true
         content:
@@ -21,19 +26,21 @@ paths:
               $ref: '#/components/schemas/Member'
       responses:
         '201':
-          description: Member successfully created
+          description: 회원이 성공적으로 생성되었습니다.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Member'
         '400':
-          description: Invalid input
+          description: 잘못된 입력값
 
   /members/login:
     post:
-      summary: Login a member
-      description: Authenticates a member and returns a token
+      summary: 회원 로그인
+      description: 회원을 인증하고 토큰을 반환합니다.
       operationId: loginMember
+      tags:
+        - Member
       requestBody:
         required: true
         content:
@@ -44,12 +51,14 @@ paths:
                 email:
                   type: string
                   format: email
+                  description: 회원 이메일 주소
                 password:
                   type: string
                   format: password
+                  description: 회원 비밀번호
       responses:
         '200':
-          description: Successfully authenticated
+          description: 인증 성공
           content:
             application/json:
               schema:
@@ -57,23 +66,28 @@ paths:
                 properties:
                   token:
                     type: string
+                    description: 인증 성공 시 반환되는 JWT 토큰
         '401':
-          description: Unauthorized
+          description: 인증 실패
 
   /members/logout:
     post:
-      summary: Logout a member
-      description: Logs out the authenticated member
+      summary: 회원 로그아웃
+      description: 인증된 회원을 로그아웃합니다.
+      tags:
+        - Member
       operationId: logoutMember
       responses:
         '200':
-          description: Successfully logged out
+          description: 로그아웃 성공
 
   /members/{memberId}:
     get:
-      summary: Get member details
-      description: Retrieves details of a specific member
+      summary: 회원 정보 조회
+      description: 특정 회원의 정보를 조회합니다.
       operationId: getMember
+      tags:
+        - Member
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - $ref: '#/components/parameters/AuthorizationHeader'
@@ -82,25 +96,29 @@ paths:
           required: true
           schema:
             type: string
+          description: 조회할 회원의 고유 ID
       responses:
         '200':
-          description: Member details retrieved successfully
+          description: 회원 정보 조회 성공
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Member'
         '404':
-          description: Member not found
+          description: 회원을 찾을 수 없음
     put:
-      summary: Update member details
-      description: Updates the details of a specific member
+      summary: 회원 정보 수정
+      description: 특정 회원의 정보를 수정합니다.
       operationId: updateMember
+      tags:
+        - Member
       parameters:
         - name: memberId
           in: path
           required: true
           schema:
             type: string
+          description: 수정할 회원의 고유 ID
       requestBody:
         required: true
         content:
@@ -109,15 +127,15 @@ paths:
               $ref: '#/components/schemas/Member'
       responses:
         '200':
-          description: Member updated successfully
+          description: 회원 정보 수정 성공
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Member'
         '400':
-          description: Invalid input
+          description: 잘못된 입력값
         '404':
-          description: Member not found
+          description: 회원을 찾을 수 없음
 
 components:
   schemas:
@@ -126,24 +144,32 @@ components:
       properties:
         id:
           type: string
+          description: 회원의 고유 ID
         name:
           type: string
+          description: 회원 이름
         email:
           type: string
           format: email
+          description: 회원 이메일 주소
         password:
           type: string
           format: password
+          description: 회원 비밀번호
         role:
-          type: string
-          enum:
-              - USER
-              - ADMIN
+          $ref: '#/components/schemas/MemberRole'
+
+    MemberRole:
+      type: string
+      enum:
+        - USER_NAME
+        - ADMIN
+
   parameters:
     AuthorizationHeader:
       name: Authorization
       in: header
-      description: Bearer token for authentication
+      description: 인증을 위한 Bearer 토큰
       required: true
       schema:
         type: string
@@ -151,7 +177,7 @@ components:
     UserIdHeader:
       name: X-User-Id
       in: header
-      description: user id header
+      description: 사용자 ID 헤더 (선택 사항)
       required: false
       schema:
         type: string
