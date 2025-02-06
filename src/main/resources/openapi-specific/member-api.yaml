@@ -1,0 +1,157 @@
+openapi: 3.0.0
+info:
+  title: Member API
+  description: API for managing members
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Local server
+
+paths:
+  /members:
+    post:
+      summary: Register a new member
+      description: Creates a new member account
+      operationId: registerMember
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Member'
+      responses:
+        '201':
+          description: Member successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid input
+
+  /members/login:
+    post:
+      summary: Login a member
+      description: Authenticates a member and returns a token
+      operationId: loginMember
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Unauthorized
+
+  /members/logout:
+    post:
+      summary: Logout a member
+      description: Logs out the authenticated member
+      operationId: logoutMember
+      responses:
+        '200':
+          description: Successfully logged out
+
+  /members/{memberId}:
+    get:
+      summary: Get member details
+      description: Retrieves details of a specific member
+      operationId: getMember
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - $ref: '#/components/parameters/AuthorizationHeader'
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Member details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '404':
+          description: Member not found
+    put:
+      summary: Update member details
+      description: Updates the details of a specific member
+      operationId: updateMember
+      parameters:
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Member'
+      responses:
+        '200':
+          description: Member updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid input
+        '404':
+          description: Member not found
+
+components:
+  schemas:
+    Member:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        role:
+          type: string
+          enum:
+              - USER
+              - ADMIN
+  parameters:
+    AuthorizationHeader:
+      name: Authorization
+      in: header
+      description: Bearer token for authentication
+      required: true
+      schema:
+        type: string
+
+    UserIdHeader:
+      name: X-User-Id
+      in: header
+      description: user id header
+      required: false
+      schema:
+        type: string
